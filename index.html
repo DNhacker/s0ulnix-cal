@@ -29,20 +29,28 @@
 
         <div class="main-content">
             <div class="input-section">
-                <!-- Regular Entry -->
-                <label for="inputText">📝 Enter your data:</label>
-                <textarea id="inputText" placeholder="Paste your list here...
+    <!-- Regular Entry -->
+    <label for="inputText">📝 Enter your data:</label>
+    <div style="position: relative; width: 100%;">
+        <textarea id="inputText" placeholder="Paste your list here...
 
 83,86,84,73,87,76,79,75,91,93(5)
 95,85,87,80,89,97,98,82,78,96(5)
 78,(25)
 88(40)
-99(15)"></textarea>
-                
-                <div class="button-group">
-                    <button class="btn-primary" onclick="addEntry()">➕ Add Entry</button>
-                    <button class="btn-danger" onclick="deleteLast()">🗑️ Delete Last</button>
-                    <button class="btn-secondary" onclick="clearAll()">🧹 Clear All</button>
+99(15)" style="width:100%; padding:15px; padding-right:90px; border:2px solid #e0e0e0; border-radius:10px; font-size:14px; font-family:'Courier New',monospace; resize:vertical; min-height:200px; line-height:1.8;"></textarea>
+        <button class="btn-paste-inside" onclick="pasteFromClipboard()" title="Paste from clipboard">
+            📋 Paste
+        </button>
+    </div>
+    
+    <div class="button-group">
+        <button class="btn-primary" onclick="addEntry()">➕ Add Entry</button>
+        <button class="btn-danger" onclick="deleteLast()">🗑️ Delete Last</button>
+        <button class="btn-secondary" onclick="clearAll()">🧹 Clear All</button>
+    </div>
+    
+    
                 </div>
 
                 <!-- Manual Amount Entry -->
@@ -114,6 +122,58 @@
                 showToast('🔀 JC Mode: OFF', '');
             }
         }
+        // ============================================
+// PASTE FROM CLIPBOARD
+// ============================================
+        
+function pasteFromClipboard() {
+    // Check if the browser supports clipboard reading
+    if (!navigator.clipboard) {
+        showToast('Clipboard API not supported in this browser', 'error');
+        return;
+    }
+    
+    // Request permission to read clipboard
+    navigator.clipboard.readText()
+        .then(text => {
+            if (text) {
+                const textarea = document.getElementById('inputText');
+                textarea.value = text;
+                showToast('📋 Pasted from clipboard!', 'success');
+            } else {
+                showToast('Clipboard is empty', 'error');
+            }
+        })
+        .catch(err => {
+            // If permission denied, try alternative method
+            console.warn('Clipboard read failed:', err);
+            
+            // Fallback: Use a hidden textarea
+            const hiddenInput = document.createElement('textarea');
+            hiddenInput.style.position = 'fixed';
+            hiddenInput.style.opacity = '0';
+            hiddenInput.style.pointerEvents = 'none';
+            hiddenInput.style.top = '-9999px';
+            document.body.appendChild(hiddenInput);
+            hiddenInput.focus();
+            
+            // Try to paste using execCommand (works in some browsers)
+            try {
+                document.execCommand('paste');
+                const text = hiddenInput.value;
+                if (text) {
+                    document.getElementById('inputText').value = text;
+                    showToast('📋 Pasted from clipboard!', 'success');
+                } else {
+                    showToast('Clipboard is empty or access denied', 'error');
+                }
+            } catch (e) {
+                showToast('Please paste manually using Ctrl+V', 'error');
+            }
+            
+            document.body.removeChild(hiddenInput);
+        });
+}
 
         // ============================================
         // ADD REGULAR ENTRY
