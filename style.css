@@ -100,6 +100,46 @@ header .badge {
 }
 
 /* ============================================
+   PASTE BUTTON
+   ============================================ */
+
+.btn-paste {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    min-height: 44px;
+    min-width: 80px;
+    white-space: nowrap;
+}
+
+.btn-paste:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-paste:active {
+    transform: scale(0.96);
+}
+
+/* ============================================
+   RESPONSIVE - Mobile
+   ============================================ */
+
+@media (max-width: 480px) {
+    .btn-paste {
+        padding: 10px 16px;
+        font-size: 14px;
+        min-width: 60px;
+        width: 100%;
+    }
+}
+/* ============================================
    RESPONSIVE - Mobile
    ============================================ */
 
