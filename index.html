@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>s0ulnix Parser</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+    <h1>📊 S0ulNix Parser</h1>
+    <p>Add entries manually one by one</p>
+    <span class="badge">27 Formats • Crossing • JC Mode • Manual Entry</span>
+    
+    <!-- ============================================ -->
+    <!-- INSTAGRAM CONTACT SECTION -->
+    <!-- ============================================ -->
+    <div class="contact-section">
+        <a href="https://www.instagram.com/s0ulnix" target="_blank" class="instagram-link">
+            <svg class="instagram-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+            </svg>
+            <span>Follow me on Instagram</span>
+        </a>
+    </div>
+    <!-- ============================================ -->
+</header>
+
+        <div class="main-content">
+            <div class="input-section">
+                <!-- Regular Entry -->
+                <label for="inputText">📝 Enter your data:</label>
+                <textarea id="inputText" placeholder="Paste your list here...
+
+83,86,84,73,87,76,79,75,91,93(5)
+95,85,87,80,89,97,98,82,78,96(5)
+78,(25)
+88(40)
+99(15)"></textarea>
+                
+                <div class="button-group">
+                    <button class="btn-primary" onclick="addEntry()">➕ Add Entry</button>
+                    <button class="btn-danger" onclick="deleteLast()">🗑️ Delete Last</button>
+                    <button class="btn-secondary" onclick="clearAll()">🧹 Clear All</button>
+                </div>
+
+                <!-- Manual Amount Entry -->
+                <div class="manual-section">
+                    <label>💰 Manual Amount Entry:</label>
+                    <div style="display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap;">
+                        <input type="number" id="manualAmount" placeholder="Enter amount..." style="flex:1; padding:10px; border:2px solid #e0e0e0; border-radius:8px; font-size:14px; min-width:120px;">
+                        <input type="text" id="manualDesc" placeholder="Description (optional)" style="flex:1; padding:10px; border:2px solid #e0e0e0; border-radius:8px; font-size:14px; min-width:120px;">
+                        <button class="btn-manual" onclick="addManual()">➕ Add Amount</button>
+                    </div>
+                </div>
+
+                <!-- Crossing Section -->
+                <div class="crossing-section">
+                    <label>✂️ Crossing Entry:</label>
+                    <div style="display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap;">
+                        <textarea id="crossingInput" placeholder="Enter crossing data...
+6435(10)
+4563901 into 20
+38265 into 10" style="flex:1; padding:10px; border:2px solid #e0e0e0; border-radius:8px; font-size:14px; font-family:'Courier New',monospace; resize:vertical; min-height:80px; min-width:200px;"></textarea>
+                        <button class="btn-crossing" onclick="addCrossing()">✂️ Add Crossing</button>
+                    </div>
+                    <div style="margin-top: 8px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <button id="jcToggleBtn" class="btn-jc" onclick="toggleJCMode()">🔀 JC: OFF</button>
+                        <span style="font-size: 12px; color: #999;">Click to toggle JC mode</span>
+                    </div>
+                </div>
+                
+                <div class="shortcut-hint">
+                    Press <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to add entry
+                </div>
+            </div>
+
+            <div class="results-section" id="resultsSection">
+                <div class="entries-container" id="entriesContainer">
+                    <div class="empty-state">
+                        <div class="icon">📝</div>
+                        <p>No entries yet. Add your first list above!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="parser.js"></script>
+    <script src="formatter.js"></script>
+    <script>
+        // Initialize
+        const parser = new s0ulnixParser();
+        const formatter = new s0ulnixFormatter();
+
+        // ============================================
+        // TOGGLE JC MODE
+        // ============================================
+
+        function toggleJCMode() {
+            const newState = formatter.toggleJCMode();
+            const btn = document.getElementById('jcToggleBtn');
+            
+            if (newState) {
+                btn.textContent = '🔀 JC: ON';
+                btn.classList.add('active');
+                showToast('🔀 JC Mode: ON', '');
+            } else {
+                btn.textContent = '🔀 JC: OFF';
+                btn.classList.remove('active');
+                showToast('🔀 JC Mode: OFF', '');
+            }
+        }
+
+        // ============================================
+        // ADD REGULAR ENTRY
+        // ============================================
+        
+        function addEntry() {
+            const text = document.getElementById('inputText').value;
+            if (!text.trim()) {
+                showToast('Please paste some data to add', 'error');
+                return;
+            }
+
+            try {
+                const result = formatter.addEntry(text);
+                
+                if (!result) {
+                    showToast('No valid data found in this entry', 'error');
+                    return;
+                }
+
+                document.getElementById('inputText').value = '';
+                updateDisplay();
+                showToast(`✅ Added: ${result.entry.total}`, 'success');
+                
+            } catch (error) {
+                showToast('❌ Error: ' + error.message, 'error');
+                console.error(error);
+            }
+        }
+
+        // ============================================
+        // ADD MANUAL AMOUNT
+        // ============================================
+        
+        function addManual() {
+            const amountInput = document.getElementById('manualAmount');
+            const descInput = document.getElementById('manualDesc');
+            const amount = parseFloat(amountInput.value);
+            
+            if (isNaN(amount) || amount <= 0) {
+                showToast('Please enter a valid amount', 'error');
+                return;
+            }
+            
+            const description = descInput.value.trim() || 'Manual Amount';
+            const result = formatter.addManualAmount(amount, description);
+            
+            if (result) {
+                amountInput.value = '';
+                descInput.value = '';
+                updateDisplay();
+                showToast(`✅ Added: ${amount}`, 'success');
+            }
+        }
+
+        // ============================================
+        // ADD CROSSING ENTRY
+        // ============================================
+
+        function addCrossing() {
+            const text = document.getElementById('crossingInput').value;
+            if (!text.trim()) {
+                showToast('Please enter crossing data', 'error');
+                return;
+            }
+
+            try {
+                const result = formatter.addCrossingEntry(text);
+                
+                if (!result) {
+                    showToast('No valid crossing data found', 'error');
+                    return;
+                }
+
+                document.getElementById('crossingInput').value = '';
+                updateDisplay();
+                
+                // Reset JC button to OFF after entry
+                const btn = document.getElementById('jcToggleBtn');
+                btn.textContent = '🔀 JC: OFF';
+                btn.classList.remove('active');
+                
+                showToast(`✂️ Added: ${result.entry.total}`, 'success');
+                
+            } catch (error) {
+                showToast('❌ Error: ' + error.message, 'error');
+                console.error(error);
+            }
+        }
+
+        // ============================================
+        // DELETE LAST ENTRY
+        // ============================================
+        
+        function deleteLast() {
+            if (formatter.entries.length === 0) {
+                showToast('No entries to delete', 'error');
+                return;
+            }
+            
+            const result = formatter.deleteLastEntry();
+            if (result) {
+                updateDisplay();
+                showToast(`🗑️ Removed`, '');
+            }
+        }
+
+        // ============================================
+        // CLEAR ALL
+        // ============================================
+        
+        function clearAll() {
+            if (formatter.entries.length === 0) return;
+            
+            if (confirm('Clear all entries?')) {
+                formatter.clearAll();
+                updateDisplay();
+                showToast('🗑️ All cleared', '');
+            }
+        }
+
+        // ============================================
+        // UPDATE DISPLAY
+        // ============================================
+        
+        function updateDisplay() {
+            const container = document.getElementById('entriesContainer');
+            const html = formatter.formatAllEntries();
+            container.innerHTML = html;
+            
+            const section = document.getElementById('resultsSection');
+            if (formatter.entries.length > 0) {
+                section.classList.add('visible');
+            } else {
+                section.classList.remove('visible');
+            }
+        }
+
+        // ============================================
+        // MINIMALIST TOAST
+        // ============================================
+        
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            container.innerHTML = '';
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            
+            requestAnimationFrame(() => toast.classList.add('show'));
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+
+        // ============================================
+        // KEYBOARD SHORTCUTS
+        // ============================================
+        
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                const active = document.activeElement;
+                if (active && active.id === 'crossingInput') {
+                    addCrossing();
+                } else if (active && active.id === 'manualAmount') {
+                    addManual();
+                } else if (active && active.id === 'manualDesc') {
+                    addManual();
+                } else {
+                    addEntry();
+                }
+            }
+        });
+
+        // ============================================
+        // ENTER KEY FOR MANUAL AMOUNT
+        // ============================================
+        
+        document.getElementById('manualAmount').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addManual();
+            }
+        });
+
+        document.getElementById('manualDesc').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addManual();
+            }
+        });
+
+        // ============================================
+        // INIT
+        // ============================================
+        
+        updateDisplay();
+        console.log('📊 s0ulnix Parser loaded!');
+        console.log('✂️ Crossing mode available');
+        console.log('💰 Manual amount entry available');
+    </script>
+</body>
+</html>
