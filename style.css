@@ -47,6 +47,7 @@ header .badge {
     font-size: 0.8em;
     margin-top: 8px;
 }
+
 /* ============================================
    INSTAGRAM CONTACT SECTION
    ============================================ */
@@ -100,61 +101,149 @@ header .badge {
 }
 
 /* ============================================
-   PASTE BUTTON
+   SETTINGS PANEL (Gemini API Key)
    ============================================ */
 
-.btn-paste {
+.settings-panel {
+    background: #f0f4ff;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border-left: 4px solid #667eea;
+}
+
+.settings-panel label {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.settings-panel input {
+    padding: 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.settings-panel input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.btn-save-key {
+    padding: 10px 20px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 12px 20px;
     border: none;
-    border-radius: 10px;
-    font-size: 16px;
+    border-radius: 8px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
-    min-height: 44px;
-    min-width: 80px;
     white-space: nowrap;
 }
 
-.btn-paste:hover {
+.btn-save-key:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.settings-panel p {
+    font-size: 11px;
+    color: #999;
+    margin-top: 6px;
+}
+
+.settings-panel a {
+    color: #667eea;
+    text-decoration: none;
+}
+
+.settings-panel a:hover {
+    text-decoration: underline;
+}
+
+/* ============================================
+   BUTTONS INSIDE TEXTAREA (Paste + Magic)
+   ============================================ */
+
+.btn-paste-inside {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    z-index: 1;
+    white-space: nowrap;
+}
+
+.btn-paste-inside:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
 }
 
-.btn-paste:active {
+.btn-paste-inside:active {
     transform: scale(0.96);
 }
 
-/* ============================================
-   RESPONSIVE - Mobile
-   ============================================ */
+/* 🪄 Magic Button */
+.btn-magic-inside {
+    position: absolute;
+    right: 92px;
+    top: 12px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    z-index: 1;
+    white-space: nowrap;
+    animation: magicGlow 2s ease-in-out infinite;
+}
 
-@media (max-width: 480px) {
-    .btn-paste {
-        padding: 10px 16px;
-        font-size: 14px;
-        min-width: 60px;
-        width: 100%;
+.btn-magic-inside:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 25px rgba(240, 147, 251, 0.6);
+    animation: none;
+}
+
+.btn-magic-inside:active {
+    transform: scale(0.96);
+}
+
+.btn-magic-inside:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    animation: none;
+}
+
+@keyframes magicGlow {
+    0%, 100% {
+        box-shadow: 0 0 5px rgba(240, 147, 251, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(240, 147, 251, 0.9);
     }
 }
-/* ============================================
-   RESPONSIVE - Mobile
-   ============================================ */
 
-@media (max-width: 480px) {
-    .instagram-link {
-        padding: 8px 18px;
-        font-size: 13px;
-        gap: 8px;
-    }
-    
-    .instagram-icon {
-        width: 18px;
-        height: 18px;
-    }
-}
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
 
 .main-content {
     display: grid;
@@ -415,6 +504,7 @@ button {
     font-size: 12px;
 }
 
+/* Entry Type Colors */
 .manual-entry {
     border-left-color: #ffc107 !important;
 }
@@ -425,6 +515,16 @@ button {
 
 .regular-entry {
     border-left-color: #667eea !important;
+}
+
+/* 🪄 AI Entry Type */
+.ai-entry {
+    border-left-color: #f093fb !important;
+}
+
+.ai-entry .entry-type {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
 }
 
 .entry-header {
@@ -544,6 +644,10 @@ button {
     background: rgba(40, 167, 69, 0.9);
 }
 
+.toast.info {
+    background: rgba(240, 147, 251, 0.9);
+}
+
 /* ============================================
    SHORTCUT HINT
    ============================================ */
@@ -614,6 +718,32 @@ button {
         padding: 3px 10px;
     }
     
+    /* Instagram link */
+    .instagram-link {
+        padding: 8px 18px;
+        font-size: 13px;
+        gap: 8px;
+    }
+    
+    .instagram-icon {
+        width: 18px;
+        height: 18px;
+    }
+    
+    /* Settings panel */
+    .settings-panel div {
+        flex-direction: column;
+    }
+    
+    .settings-panel input {
+        width: 100%;
+        min-width: unset;
+    }
+    
+    .btn-save-key {
+        width: 100%;
+    }
+    
     /* Button groups - stack on mobile */
     .button-group {
         flex-direction: column;
@@ -663,6 +793,24 @@ button {
         min-height: 150px;
         font-size: 13px;
         padding: 12px;
+        padding-right: 15px;
+    }
+    
+    /* Paste + Magic buttons - smaller on mobile */
+    .btn-paste-inside,
+    .btn-magic-inside {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+    
+    .btn-paste-inside {
+        right: 8px;
+        top: 8px;
+    }
+    
+    .btn-magic-inside {
+        right: 72px;
+        top: 8px;
     }
     
     /* Entries */
@@ -784,6 +932,17 @@ button {
     .running-total {
         font-size: 11px;
     }
+    
+    /* Hide button labels on very small screens */
+    .btn-paste-inside,
+    .btn-magic-inside {
+        padding: 5px 8px;
+        font-size: 10px;
+    }
+    
+    .btn-magic-inside {
+        right: 65px;
+    }
 }
 
 /* ============================================
@@ -801,4 +960,37 @@ button {
     textarea {
         min-height: 120px;
     }
+}
+
+/* ============================================
+   MAGIC BUTTON LOADING STATE
+   ============================================ */
+
+.btn-magic-inside.loading {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    animation: magicSpin 1s linear infinite;
+}
+
+@keyframes magicSpin {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(-5deg); }
+    75% { transform: rotate(5deg); }
+    100% { transform: rotate(0deg); }
+}
+
+/* ============================================
+   AI FORMATTING BADGE (Optional)
+   ============================================ */
+
+.ai-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 6px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
