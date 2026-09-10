@@ -9,87 +9,100 @@
 <body>
     <div class="container">
         <header>
-    <h1>📊 S0ulNix Parser</h1>
-    <p>Add entries manually one by one</p>
-    <span class="badge">27 Formats • Crossing • JC Mode • Manual Entry</span>
-    
-    <!-- ============================================ -->
-    <!-- INSTAGRAM CONTACT SECTION -->
-    <!-- ============================================ -->
-    <div class="contact-section">
-        <a href="https://www.instagram.com/s0ulnix" target="_blank" class="instagram-link">
-            <svg class="instagram-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
-            </svg>
-            <span>Follow me on Instagram</span>
-        </a>
-    </div>
-    <!-- ============================================ -->
-</header>
+            <h1>📊 S0ulNix Parser</h1>
+            <p>Add entries manually one by one</p>
+            <span class="badge">27 Formats • Crossing • JC Mode • AI Magic</span>
+            
+            <div class="contact-section">
+                <a href="https://www.instagram.com/s0ulnix" target="_blank" class="instagram-link">
+                    <svg class="instagram-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+                    </svg>
+                    <span>Follow me on Instagram</span>
+                </a>
+            </div>
+        </header>
 
         <div class="main-content">
             <div class="input-section">
-    <!-- Regular Entry -->
-    <label for="inputText">📝 Enter your data:</label>
-    <div style="position: relative; width: 100%;">
-        <textarea id="inputText" placeholder="Paste your list here...
+                <!-- Gemini API Key Settings -->
+                <div class="settings-panel">
+                    <label>🔑 Gemini API Key:</label>
+                    <div style="display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; align-items: center;">
+                        <input type="password" id="geminiKey" placeholder="Enter your Gemini API key..." style="flex:1; padding:10px; border:2px solid #e0e0e0; border-radius:8px; font-size:14px; min-width:200px;">
+                        <button class="btn-save-key" onclick="saveGeminiKey()">💾 Save</button>
+                        <span id="keyStatus" style="font-size:13px; color:#28a745;"></span>
+                    </div>
+                    <p style="font-size:11px; color:#999; margin-top:6px;">
+                        Get free key from <a href="https://aistudio.google.com/" target="_blank" style="color:#667eea;">Google AI Studio</a>
+                    </p>
+                </div>
+
+                <!-- Regular Entry -->
+                <label for="inputText">📝 Enter your data:</label>
+                <div style="position: relative; width: 100%;">
+                    <textarea id="inputText" placeholder="Paste your list here...
 
 83,86,84,73,87,76,79,75,91,93(5)
 95,85,87,80,89,97,98,82,78,96(5)
 78,(25)
 88(40)
-99(15)" style="width:100%; padding:15px; padding-right:90px; border:2px solid #e0e0e0; border-radius:10px; font-size:14px; font-family:'Courier New',monospace; resize:vertical; min-height:200px; line-height:1.8;"></textarea>
-        <button class="btn-paste-inside" onclick="pasteFromClipboard()" title="Paste from clipboard">
-            📋 Paste
-        </button>
-    </div>
-    
-    <div class="button-group">
-        <button class="btn-primary" onclick="addEntry()">➕ Add Entry</button>
-        <button class="btn-danger" onclick="deleteLast()">🗑️ Delete Last</button>
-        <button class="btn-secondary" onclick="clearAll()">🧹 Clear All</button>
-    </div>
-    
-    
-                </div>
-
-                <!-- Manual Amount Entry -->
-                <div class="manual-section">
-                    <label>💰 Manual Amount Entry:</label>
-                    <div style="display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap;">
-                        <input type="number" id="manualAmount" placeholder="Enter amount..." style="flex:1; padding:10px; border:2px solid #e0e0e0; border-radius:8px; font-size:14px; min-width:120px;">
-                        <input type="text" id="manualDesc" placeholder="Description (optional)" style="flex:1; padding:10px; border:2px solid #e0e0e0; border-radius:8px; font-size:14px; min-width:120px;">
-                        <button class="btn-manual" onclick="addManual()">➕ Add Amount</button>
-                    </div>
-                </div>
-
-                <!-- Crossing Section -->
-                <div class="crossing-section">
-                    <label>✂️ Crossing Entry:</label>
-                    <div style="display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap;">
-                        <textarea id="crossingInput" placeholder="Enter crossing data...
-6435(10)
-4563901 into 20
-38265 into 10" style="flex:1; padding:10px; border:2px solid #e0e0e0; border-radius:8px; font-size:14px; font-family:'Courier New',monospace; resize:vertical; min-height:80px; min-width:200px;"></textarea>
-                        <button class="btn-crossing" onclick="addCrossing()">✂️ Add Crossing</button>
-                    </div>
-                    <div style="margin-top: 8px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                        <button id="jcToggleBtn" class="btn-jc" onclick="toggleJCMode()">🔀 JC: OFF</button>
-                        <span style="font-size: 12px; color: #999;">Click to toggle JC mode</span>
+99(15)" style="width:100%; padding:15px; padding-right:180px; border:2px solid #e0e0e0; border-radius:10px; font-size:14px; font-family:'Courier New',monospace; resize:vertical; min-height:200px; line-height:1.8;"></textarea>
+                    
+                    <!-- Paste + Magic buttons inside textarea -->
+                    <div style="position: absolute; right: 12px; top: 12px; display: flex; gap: 6px; z-index: 1;">
+                        <button class="btn-paste-inside" onclick="pasteFromClipboard()" title="Paste from clipboard">
+                            📋 Paste
+                        </button>
+                        <button class="btn-magic-inside" onclick="magicFormat()" title="AI format with Gemini">
+                            🪄 Magic
+                        </button>
                     </div>
                 </div>
                 
-                <div class="shortcut-hint">
-                    Press <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to add entry
+                <div class="button-group">
+                    <button class="btn-primary" onclick="addEntry()">➕ Add Entry</button>
+                    <button class="btn-danger" onclick="deleteLast()">🗑️ Delete Last</button>
+                    <button class="btn-secondary" onclick="clearAll()">🧹 Clear All</button>
                 </div>
             </div>
 
-            <div class="results-section" id="resultsSection">
-                <div class="entries-container" id="entriesContainer">
-                    <div class="empty-state">
-                        <div class="icon">📝</div>
-                        <p>No entries yet. Add your first list above!</p>
-                    </div>
+            <!-- Manual Amount Entry -->
+            <div class="manual-section">
+                <label>💰 Manual Amount Entry:</label>
+                <div style="display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap;">
+                    <input type="number" id="manualAmount" placeholder="Enter amount..." style="flex:1; padding:10px; border:2px solid #e0e0e0; border-radius:8px; font-size:14px; min-width:120px;">
+                    <input type="text" id="manualDesc" placeholder="Description (optional)" style="flex:1; padding:10px; border:2px solid #e0e0e0; border-radius:8px; font-size:14px; min-width:120px;">
+                    <button class="btn-manual" onclick="addManual()">➕ Add Amount</button>
+                </div>
+            </div>
+
+            <!-- Crossing Section -->
+            <div class="crossing-section">
+                <label>✂️ Crossing Entry:</label>
+                <div style="display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap;">
+                    <textarea id="crossingInput" placeholder="Enter crossing data...
+6435(10)
+4563901 into 20
+38265 into 10" style="flex:1; padding:10px; border:2px solid #e0e0e0; border-radius:8px; font-size:14px; font-family:'Courier New',monospace; resize:vertical; min-height:80px; min-width:200px;"></textarea>
+                    <button class="btn-crossing" onclick="addCrossing()">✂️ Add Crossing</button>
+                </div>
+                <div style="margin-top: 8px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <button id="jcToggleBtn" class="btn-jc" onclick="toggleJCMode()">🔀 JC: OFF</button>
+                    <span style="font-size: 12px; color: #999;">Click to toggle JC mode</span>
+                </div>
+            </div>
+            
+            <div class="shortcut-hint">
+                Press <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to add entry
+            </div>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <div class="entries-container" id="entriesContainer">
+                <div class="empty-state">
+                    <div class="icon">📝</div>
+                    <p>No entries yet. Add your first list above!</p>
                 </div>
             </div>
         </div>
@@ -97,6 +110,8 @@
 
     <div class="toast-container" id="toastContainer"></div>
 
+    <!-- Gemini AI Logic -->
+    <script src="gemini.js"></script>
     <script src="parser.js"></script>
     <script src="formatter.js"></script>
     <script>
@@ -107,7 +122,6 @@
         // ============================================
         // TOGGLE JC MODE
         // ============================================
-
         function toggleJCMode() {
             const newState = formatter.toggleJCMode();
             const btn = document.getElementById('jcToggleBtn');
@@ -122,63 +136,56 @@
                 showToast('🔀 JC Mode: OFF', '');
             }
         }
+
         // ============================================
-// PASTE FROM CLIPBOARD
-// ============================================
-        
-function pasteFromClipboard() {
-    // Check if the browser supports clipboard reading
-    if (!navigator.clipboard) {
-        showToast('Clipboard API not supported in this browser', 'error');
-        return;
-    }
-    
-    // Request permission to read clipboard
-    navigator.clipboard.readText()
-        .then(text => {
-            if (text) {
-                const textarea = document.getElementById('inputText');
-                textarea.value = text;
-                showToast('📋 Pasted from clipboard!', 'success');
-            } else {
-                showToast('Clipboard is empty', 'error');
-            }
-        })
-        .catch(err => {
-            // If permission denied, try alternative method
-            console.warn('Clipboard read failed:', err);
-            
-            // Fallback: Use a hidden textarea
-            const hiddenInput = document.createElement('textarea');
-            hiddenInput.style.position = 'fixed';
-            hiddenInput.style.opacity = '0';
-            hiddenInput.style.pointerEvents = 'none';
-            hiddenInput.style.top = '-9999px';
-            document.body.appendChild(hiddenInput);
-            hiddenInput.focus();
-            
-            // Try to paste using execCommand (works in some browsers)
-            try {
-                document.execCommand('paste');
-                const text = hiddenInput.value;
-                if (text) {
-                    document.getElementById('inputText').value = text;
-                    showToast('📋 Pasted from clipboard!', 'success');
-                } else {
-                    showToast('Clipboard is empty or access denied', 'error');
-                }
-            } catch (e) {
-                showToast('Please paste manually using Ctrl+V', 'error');
+        // PASTE FROM CLIPBOARD
+        // ============================================
+        function pasteFromClipboard() {
+            if (!navigator.clipboard) {
+                showToast('Clipboard API not supported in this browser', 'error');
+                return;
             }
             
-            document.body.removeChild(hiddenInput);
-        });
-}
+            navigator.clipboard.readText()
+                .then(text => {
+                    if (text) {
+                        const textarea = document.getElementById('inputText');
+                        textarea.value = text;
+                        showToast('📋 Pasted from clipboard!', 'success');
+                    } else {
+                        showToast('Clipboard is empty', 'error');
+                    }
+                })
+                .catch(err => {
+                    console.warn('Clipboard read failed:', err);
+                    const hiddenInput = document.createElement('textarea');
+                    hiddenInput.style.position = 'fixed';
+                    hiddenInput.style.opacity = '0';
+                    hiddenInput.style.pointerEvents = 'none';
+                    hiddenInput.style.top = '-9999px';
+                    document.body.appendChild(hiddenInput);
+                    hiddenInput.focus();
+                    
+                    try {
+                        document.execCommand('paste');
+                        const text = hiddenInput.value;
+                        if (text) {
+                            document.getElementById('inputText').value = text;
+                            showToast('📋 Pasted from clipboard!', 'success');
+                        } else {
+                            showToast('Clipboard is empty or access denied', 'error');
+                        }
+                    } catch (e) {
+                        showToast('Please paste manually using Ctrl+V', 'error');
+                    }
+                    
+                    document.body.removeChild(hiddenInput);
+                });
+        }
 
         // ============================================
         // ADD REGULAR ENTRY
         // ============================================
-        
         function addEntry() {
             const text = document.getElementById('inputText').value;
             if (!text.trim()) {
@@ -207,7 +214,6 @@ function pasteFromClipboard() {
         // ============================================
         // ADD MANUAL AMOUNT
         // ============================================
-        
         function addManual() {
             const amountInput = document.getElementById('manualAmount');
             const descInput = document.getElementById('manualDesc');
@@ -232,7 +238,6 @@ function pasteFromClipboard() {
         // ============================================
         // ADD CROSSING ENTRY
         // ============================================
-
         function addCrossing() {
             const text = document.getElementById('crossingInput').value;
             if (!text.trim()) {
@@ -251,7 +256,6 @@ function pasteFromClipboard() {
                 document.getElementById('crossingInput').value = '';
                 updateDisplay();
                 
-                // Reset JC button to OFF after entry
                 const btn = document.getElementById('jcToggleBtn');
                 btn.textContent = '🔀 JC: OFF';
                 btn.classList.remove('active');
@@ -267,7 +271,6 @@ function pasteFromClipboard() {
         // ============================================
         // DELETE LAST ENTRY
         // ============================================
-        
         function deleteLast() {
             if (formatter.entries.length === 0) {
                 showToast('No entries to delete', 'error');
@@ -284,7 +287,6 @@ function pasteFromClipboard() {
         // ============================================
         // CLEAR ALL
         // ============================================
-        
         function clearAll() {
             if (formatter.entries.length === 0) return;
             
@@ -298,7 +300,6 @@ function pasteFromClipboard() {
         // ============================================
         // UPDATE DISPLAY
         // ============================================
-        
         function updateDisplay() {
             const container = document.getElementById('entriesContainer');
             const html = formatter.formatAllEntries();
@@ -315,7 +316,6 @@ function pasteFromClipboard() {
         // ============================================
         // MINIMALIST TOAST
         // ============================================
-        
         function showToast(message, type = 'info') {
             const container = document.getElementById('toastContainer');
             container.innerHTML = '';
@@ -336,7 +336,6 @@ function pasteFromClipboard() {
         // ============================================
         // KEYBOARD SHORTCUTS
         // ============================================
-        
         document.addEventListener('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                 e.preventDefault();
@@ -353,10 +352,6 @@ function pasteFromClipboard() {
             }
         });
 
-        // ============================================
-        // ENTER KEY FOR MANUAL AMOUNT
-        // ============================================
-        
         document.getElementById('manualAmount').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -374,11 +369,9 @@ function pasteFromClipboard() {
         // ============================================
         // INIT
         // ============================================
-        
         updateDisplay();
         console.log('📊 s0ulnix Parser loaded!');
-        console.log('✂️ Crossing mode available');
-        console.log('💰 Manual amount entry available');
+        console.log('🪄 Gemini Magic button available');
     </script>
 </body>
 </html>
