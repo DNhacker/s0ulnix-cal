@@ -2,6 +2,7 @@
  * s0ulnix Parser - Complete Implementation
  * Updated: Crossing logic ONLY works when explicitly enabled
  * Regular "Enter your data" section NEVER uses crossing logic
+ * FIXED: box=value format no longer double-counts
  */
 
 class s0ulnixParser {
@@ -20,9 +21,8 @@ class s0ulnixParser {
         
         this.SEPARATORS = /[\s*,/\\\-_|.'`=]+/;
         this.jcMode = false;
-        this.enableCrossing = false; // Crossing disabled by default
+        this.enableCrossing = false;
         
-        // Value detection patterns
         this.VALUE_PATTERNS = [
             /\{\{(\d+)\}\}/,
             /\{(\d+)\}/,
@@ -53,7 +53,6 @@ class s0ulnixParser {
         this.enableCrossing = enabled;
     }
 
-    // Toggle JC mode
     toggleJCMode() {
         this.jcMode = !this.jcMode;
         return this.jcMode;
@@ -118,11 +117,10 @@ class s0ulnixParser {
     }
 
     // ============================================
-    // EXTRACT CROSSING BOXES (for crossing logic)
+    // EXTRACT CROSSING BOXES
     // ============================================
     
     extractCrossingBoxes(line) {
-        // Remove value parts
         let clean = line;
         
         for (const pattern of this.VALUE_PATTERNS) {
@@ -140,14 +138,12 @@ class s0ulnixParser {
             .replace(/\.\s*$/, '')
             .replace(/\|\s*/g, '');
         
-        // Remove all separators and get the clean string
         const crossingString = clean.replace(/[\s*,/\\\-_|.'`=]+/g, '');
         
         if (crossingString.length > 0) {
             return crossingString;
         }
         
-        // Fallback: try to get numbers
         const numbers = clean.match(/\d+/g);
         if (numbers && numbers.length > 0) {
             return numbers.join('');
@@ -168,16 +164,12 @@ class s0ulnixParser {
         if (!crossingString) return null;
         
         const length = crossingString.length;
-        
-        // Length must be between 3 and 8
         if (length < 3 || length > 8) return null;
         
         let boxes;
         if (this.jcMode) {
-            // JC Mode: (length × length) - length = length × (length - 1)
             boxes = (length * length) - length;
         } else {
-            // Standard Crossing: length × length
             boxes = length * length;
         }
         
@@ -196,39 +188,27 @@ class s0ulnixParser {
 
     // ============================================
     // DETECT IF LINE IS CROSSING FORMAT
-    // ONLY WORKS WHEN enableCrossing IS TRUE
     // ============================================
     
     isCrossingFormat(line) {
-        // If crossing is disabled, NEVER treat as crossing
-        if (!this.enableCrossing) {
-            return false;
-        }
+        if (!this.enableCrossing) return false;
         
-        // Check if line has a value
         const value = this.extractValue(line);
         if (value === null) return false;
         
-        // Remove the value part to check the box part
         let clean = line;
         for (const pattern of this.VALUE_PATTERNS) {
             clean = clean.replace(pattern, '');
         }
         clean = clean.trim();
         
-        // If there are separators like comma, space, hyphen, etc., it's NOT crossing
         const separatorMatch = clean.match(/[\s*,/\\\-_|.'`]/);
-        if (separatorMatch) {
-            return false;
-        }
+        if (separatorMatch) return false;
         
-        // Remove all non-digit characters and check length
         const crossingString = clean.replace(/[^0-9]/g, '');
         if (!crossingString) return false;
         
         const length = crossingString.length;
-        
-        // Crossing should be a continuous string of 3-8 digits
         const isOnlyDigits = /^[0-9]+$/.test(clean);
         if (!isOnlyDigits) return false;
         
@@ -293,18 +273,10 @@ class s0ulnixParser {
         if (clean.includes('intu(((') || clean.includes('intu((') || clean.includes('into(((')) {
             return 'INTU';
         }
-        if (clean.match(/\binto\s+\d+$/i)) {
-            return 'INTO';
-        }
-        if (clean.includes('==(') && clean.includes(').sg')) {
-            return 'SG';
-        }
-        if (clean.match(/==\d+total/)) {
-            return 'TOTAL_FORMAT';
-        }
-        if (clean.match(/total\d+$/i)) {
-            return 'TOTAL_END';
-        }
+        if (clean.match(/\binto\s+\d+$/i)) return 'INTO';
+        if (clean.includes('==(') && clean.includes(').sg')) return 'SG';
+        if (clean.match(/==\d+total/)) return 'TOTAL_FORMAT';
+        if (clean.match(/total\d+$/i)) return 'TOTAL_END';
         if (clean.includes('|') && clean.includes('=')) return 'H';
         if (clean.match(/^\d+\(\d+\)\d+\(\d+\)/)) return 'I';
         if (clean.match(/\d+\(\d+\)\d+\/\d+\/\d+\(\d+\)/)) return 'Q';
@@ -338,10 +310,109 @@ class s0ulnixParser {
 
     // ============================================
     // STEP 5: PARSE LINE BY FORMAT TYPE
+    // 🐛 FIXED: Handle box=value format FIRST
     // ============================================
     
     parseLine(line) {
-        // First check if this is a crossing format (only if enabled)
+        // ============================================
+        // 🐛 CRITICAL FIX #1: Single "01=70" format
+        // This MUST come before anything else
+        // ============================================
+        const trimmed = line.trim();
+        
+        if (/^\d+=\d+$/.test(trimmed)) {
+            const parts = trimmed.split('=');
+            const box = this.mapBoxNumber(parts[0]);
+            const value = parseInt(parts[1]);
+            return {
+                boxes: [box],
+                value: value,
+                total: value,
+                format: 'A',
+                source: line,
+                isCrossing: false,
+                boxesCount: 1,
+                display: `1 box × ${value} = ${value}`
+            };
+        }
+        
+        // ============================================
+        // 🐛 CRITICAL FIX #2: Comma-separated "01=70,02=70,03=70"
+        // This is the Gemini AI output format
+        // ============================================
+        if (/^\d+=\d+(,\s*\d+=\d+)+$/.test(trimmed)) {
+            const pairs = trimmed.split(',').map(p => p.trim());
+            const boxes = [];
+            let grandTotal = 0;
+            
+            for (const pair of pairs) {
+                const [box, val] = pair.split('=');
+                const mappedBox = this.mapBoxNumber(box);
+                const value = parseInt(val);
+                boxes.push(mappedBox);
+                grandTotal += value;
+            }
+            
+            return {
+                boxes: boxes,
+                value: Math.round(grandTotal / boxes.length),
+                total: grandTotal,
+                format: 'A_MULTI',
+                source: line,
+                isCrossing: false,
+                boxesCount: boxes.length,
+                display: `${boxes.length} boxes = ${grandTotal}`
+            };
+        }
+        
+        // ============================================
+        // 🐛 CRITICAL FIX #3: Hyphen+Equal "41-42-43=50"
+        // Must come before generic fallback
+        // ============================================
+        if (/^[\d\-]+=\d+$/.test(trimmed)) {
+            const [boxPart, valuePart] = trimmed.split('=');
+            const boxes = boxPart.split('-')
+                .map(b => this.mapBoxNumber(b.trim()))
+                .filter(b => b.length > 0);
+            const value = parseInt(valuePart);
+            return {
+                boxes: boxes,
+                value: value,
+                total: boxes.length * value,
+                format: 'B',
+                source: line,
+                isCrossing: false,
+                boxesCount: boxes.length,
+                display: `${boxes.length} boxes × ${value} = ${boxes.length * value}`
+            };
+        }
+        
+        // ============================================
+        // 🐛 CRITICAL FIX #4: Comma+Parentheses "55,56,57(70)"
+        // ============================================
+        if (/^[\d,]+\(\d+\)$/.test(trimmed)) {
+            const match = trimmed.match(/^([\d,]+)\((\d+)\)$/);
+            if (match) {
+                const boxes = match[1].split(',')
+                    .map(b => this.mapBoxNumber(b.trim()))
+                    .filter(b => b.length > 0);
+                const value = parseInt(match[2]);
+                return {
+                    boxes: boxes,
+                    value: value,
+                    total: boxes.length * value,
+                    format: 'C',
+                    source: line,
+                    isCrossing: false,
+                    boxesCount: boxes.length,
+                    display: `${boxes.length} boxes × ${value} = ${boxes.length * value}`
+                };
+            }
+        }
+        
+        // ============================================
+        // Check crossing format (only if enabled)
+        // ============================================
         if (this.isCrossingFormat(line)) {
             const result = this.calculateCrossing(line);
             if (result) {
@@ -360,7 +431,9 @@ class s0ulnixParser {
             }
         }
         
-        // Otherwise use standard parsing
+        // ============================================
+        // Continue with standard parsing
+        // ============================================
         const format = this.detectFormat(line);
         let boxes = [];
         let value = this.extractValue(line);
@@ -475,141 +548,4 @@ class s0ulnixParser {
             { name: 'E', regex: /^([\d\*]+)\((\d+)\)$/, parse: (m) => ({ boxes: m[1].split('*').map(b => this.mapBoxNumber(b.trim())), value: parseInt(m[2]) }) },
             { name: 'F', regex: /^([\d\/]+)\/(\d+)$/, parse: (m) => ({ boxes: m[1].split('/').map(b => this.mapBoxNumber(b.trim())), value: parseInt(m[2]) }) },
             { name: 'G', regex: /^([\d_]+)=(\d+)$/, parse: (m) => ({ boxes: m[1].split('_').map(b => this.mapBoxNumber(b.trim())), value: parseInt(m[2]) }) },
-            { name: 'J', regex: /^([\d\.]+)\((\d+)\)$/, parse: (m) => ({ boxes: m[1].split('..').map(b => this.mapBoxNumber(b.trim())), value: parseInt(m[2]) }) },
-            { name: 'X', regex: /^([\d,]+)==(\d+)$/, parse: (m) => ({ boxes: m[1].split(',').map(b => this.mapBoxNumber(b.trim())), value: parseInt(m[2]) }) },
-        ];
-        
-        for (const fmt of formats) {
-            const match = line.match(fmt.regex);
-            if (match) {
-                return fmt.parse(match);
-            }
-        }
-        
-        return null;
-    }
-
-    // ============================================
-    // PARSE BLOCKS (Multi-line support)
-    // ============================================
-    
-    parseBlocks(text) {
-        const lines = this.cleanInput(text);
-        const blocks = [];
-        let i = 0;
-        
-        while (i < lines.length) {
-            const line = lines[i];
-            
-            const totalMatch = line.match(/^total\s*(\d+)$/i);
-            if (totalMatch) {
-                i++;
-                continue;
-            }
-            
-            const value = this.extractValue(line);
-            
-            if (value !== null) {
-                const result = this.parseLine(line);
-                if (result) {
-                    blocks.push(result);
-                }
-                i++;
-            } else {
-                let blockLines = [line];
-                let j = i + 1;
-                let foundValue = null;
-                let valueLineIndex = -1;
-                
-                while (j < lines.length) {
-                    const nextLine = lines[j];
-                    const nextValue = this.extractValue(nextLine);
-                    
-                    if (nextValue !== null) {
-                        foundValue = nextValue;
-                        valueLineIndex = j;
-                        blockLines.push(nextLine);
-                        break;
-                    } else {
-                        blockLines.push(nextLine);
-                        j++;
-                    }
-                }
-                
-                let allBoxes = [];
-                for (const bl of blockLines) {
-                    const boxes = this.extractBoxes(bl);
-                    allBoxes.push(...boxes);
-                }
-                
-                if (allBoxes.length > 0 && foundValue !== null) {
-                    blocks.push({
-                        boxes: allBoxes.map(b => this.mapBoxNumber(b)),
-                        value: foundValue,
-                        total: allBoxes.length * foundValue,
-                        format: 'MULTI_LINE',
-                        source: blockLines.join(' | '),
-                        isCrossing: false,
-                        boxesCount: allBoxes.length,
-                        display: `${allBoxes.length} boxes × ${foundValue} = ${allBoxes.length * foundValue}`
-                    });
-                }
-                
-                i = valueLineIndex !== -1 ? valueLineIndex + 1 : lines.length;
-            }
-        }
-        
-        return blocks;
-    }
-
-    // ============================================
-    // PROCESS - Main entry point
-    // ============================================
-    
-    process(text) {
-        const cleaned = this.cleanInput(text);
-        const blocks = this.parseBlocks(text);
-        
-        let grandTotal = 0;
-        const calculation = [];
-        
-        for (const block of blocks) {
-            const total = block.total || block.boxes.length * block.value;
-            grandTotal += total;
-            
-            let displayText = block.display;
-            if (block.isCrossing) {
-                displayText = block.display;
-            }
-            
-            calculation.push({
-                source: block.source || block.boxes.join(','),
-                boxes: block.isCrossing ? block.boxesCount : block.boxes.length,
-                value: block.value,
-                total: total,
-                format: block.format || 'UNKNOWN',
-                isCrossing: block.isCrossing || false,
-                crossingLength: block.crossingLength || 0,
-                display: displayText
-            });
-        }
-        
-        return {
-            cleanedLines: cleaned,
-            blocks: calculation,
-            grandTotal: grandTotal,
-            totalBlocks: blocks.length,
-            totalBoxes: blocks.reduce((sum, b) => sum + (b.isCrossing ? b.boxesCount : b.boxes.length), 0)
-        };
-    }
-}
-
-// Export for browser
-if (typeof window !== 'undefined') {
-    window.s0ulnixParser = s0ulnixParser;
-}
-
-// Export for Node.js
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = s0ulnixParser;
-}
+            { name: 'J', regex
