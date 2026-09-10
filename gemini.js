@@ -1,11 +1,11 @@
 /**
  * gemini.js - AI Formatting with Google Gemini
  * Uses the complete Gosheet parser prompt from the original app
+ * Updated: Supports both legacy AIza keys and new AQ. keys
  */
 
 // ============================================
 // COMPLETE GEMINI SYSTEM PROMPT
-// (Extracted from the original app - formet.txt)
 // ============================================
 
 const GEMINI_SYSTEM_PROMPT = `You are a smart, fluent, human-like Gosheet parser and response assistant.
@@ -347,12 +347,14 @@ function saveGeminiKey() {
         return;
     }
     
-    // Basic validation - Gemini keys start with "AIza"
-    if (!key.startsWith('AIza')) {
+    // Accept both legacy AIza keys and new AQ. keys
+    const isValidFormat = key.startsWith('AIza') || key.startsWith('AQ.');
+    
+    if (!isValidFormat) {
         if (typeof showToast === 'function') {
-            showToast('Invalid key format (should start with AIza)', 'error');
+            showToast('Invalid key format. Should start with AIza or AQ.', 'error');
         } else {
-            alert('Invalid key format. Gemini keys start with "AIza"');
+            alert('Invalid key format. Gemini keys start with "AIza" or "AQ."');
         }
         return;
     }
@@ -390,6 +392,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // ============================================
 // CALL GEMINI API
+// Uses x-goog-api-key header (works with both AIza and AQ. keys)
 // ============================================
 
 async function callGemini(inputText) {
@@ -400,7 +403,8 @@ async function callGemini(inputText) {
     }
     
     const model = 'gemini-2.5-flash';
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    // ✅ Use header auth instead of URL query string
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
     
     const requestBody = {
         contents: [{
@@ -419,7 +423,9 @@ async function callGemini(inputText) {
     const response = await fetch(url, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            // ✅ This header works with both AIza and AQ. keys
+            'x-goog-api-key': apiKey
         },
         body: JSON.stringify(requestBody)
     });
@@ -437,6 +443,11 @@ async function callGemini(inputText) {
         if (parts && parts[0] && parts[0].text) {
             return parts[0].text;
         }
+    }
+    
+    // Check for blocked content
+    if (data.promptFeedback && data.promptFeedback.blockReason) {
+        throw new Error('Content blocked: ' + data.promptFeedback.blockReason);
     }
     
     throw new Error('Invalid response from Gemini API');
@@ -494,14 +505,13 @@ function cleanAIOutput(text) {
         }
         if (shouldSkip) continue;
         
-        // Skip lines with markdown headers (##, ###)
+        // Skip markdown headers (##, ###)
         if (/^#{1,6}\s/.test(line)) continue;
         
         // Skip lines that are only dashes/equals (separators)
         if (/^[-=]{3,}$/.test(line)) continue;
         
         // Keep lines that look like valid data
-        // Valid: contains = OR pure numbers OR box patterns
         const hasEquals = line.includes('=');
         const isPureNumber = /^\d+$/.test(line);
         const isDataPattern = /^[\d\s,.\-*_()\/|'`]+$/.test(line);
@@ -573,15 +583,19 @@ async function magicFormat() {
     } catch (error) {
         console.error('Magic format error:', error);
         
-        let errorMsg = error.message;
+        let errorMsg = error.message || 'Unknown error';
         
         // Friendlier error messages
         if (errorMsg.includes('API_KEY_INVALID') || errorMsg.includes('API key not valid')) {
             errorMsg = 'Invalid API key. Please check and re-save your key.';
-        } else if (errorMsg.includes('quota') || errorMsg.includes('QUOTA')) {
-            errorMsg = 'API quota exceeded. Try again later.';
-        } else if (errorMsg.includes('Failed to fetch')) {
+        } else if (errorMsg.includes('quota') || errorMsg.includes('QUOTA') || errorMsg.includes('429')) {
+            errorMsg = 'API quota exceeded. Try again in a minute.';
+        } else if (errorMsg.includes('Failed to fetch') || errorMsg.includes('NetworkError')) {
             errorMsg = 'Network error. Check your internet connection.';
+        } else if (errorMsg.includes('Content blocked')) {
+            errorMsg = 'AI blocked the content. Try reformatting your input.';
+        } else if (errorMsg.includes('404')) {
+            errorMsg = 'Model not found. The API may have changed.';
         }
         
         if (typeof showToast === 'function') {
