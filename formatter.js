@@ -2,6 +2,7 @@
  * s0ulnix Formatter - Display Results
  * Updated: Added Crossing support, manual amount entry, removed export
  * JC Mode: Toggle button - auto-resets to OFF after each crossing entry
+ * FIXED: Proper handling of box=value format and AI-formatted data
  */
 
 class s0ulnixFormatter {
@@ -66,16 +67,13 @@ class s0ulnixFormatter {
     }
 
     // ============================================
-    // CROSSING ENTRY - FIXED
+    // CROSSING ENTRY
     // ============================================
     
     addCrossingEntry(text) {
-        // ============================================
-        // ENABLE CROSSING FOR THIS ENTRY ONLY
-        // ============================================
+        // Enable crossing for this entry only
         this.parser.setCrossingEnabled(true);
         this.parser.setJCMode(this.jcMode);
-        // ============================================
         
         const result = this.parser.process(text);
         
@@ -120,6 +118,7 @@ class s0ulnixFormatter {
 
     // ============================================
     // ADD ENTRY (Regular)
+    // FIXED: Handles Gemini AI-formatted data properly
     // ============================================
     
     addEntry(text) {
@@ -148,6 +147,75 @@ class s0ulnixFormatter {
             runningTotal: this.runningTotal,
             totalEntries: this.entries.length
         };
+    }
+
+    // ============================================
+    // ADD AI-FORMATTED ENTRY (NEW)
+    // Specifically for Gemini-formatted data
+    // ============================================
+    
+    addAIEntry(text) {
+        // Pre-process the AI output to ensure clean formatting
+        const cleaned = this.cleanAIOutput(text);
+        
+        const result = this.parser.process(cleaned);
+        
+        if (result.blocks.length === 0) {
+            return null;
+        }
+        
+        const entry = {
+            id: Date.now(),
+            type: 'ai',
+            text: cleaned,
+            blocks: result.blocks,
+            total: result.grandTotal,
+            totalBoxes: result.totalBoxes,
+            totalBlocks: result.totalBlocks,
+            timestamp: new Date().toLocaleTimeString()
+        };
+        
+        this.entries.push(entry);
+        this.runningTotal += entry.total;
+        
+        return {
+            entry: entry,
+            runningTotal: this.runningTotal,
+            totalEntries: this.entries.length
+        };
+    }
+
+    // ============================================
+    // CLEAN AI OUTPUT (NEW)
+    // Removes markdown, extra whitespace, etc.
+    // ============================================
+    
+    cleanAIOutput(text) {
+        if (!text) return '';
+        
+        let cleaned = text.trim();
+        
+        // Remove markdown code fences
+        cleaned = cleaned.replace(/```[\s\S]*?```/g, (match) => {
+            return match.replace(/```[a-z]*\n?/g, '').replace(/```/g, '');
+        });
+        
+        // Remove any explanatory text lines (lines with words but no = or numbers)
+        const lines = cleaned.split('\n');
+        const validLines = lines.filter(line => {
+            const trimmed = line.trim();
+            if (!trimmed) return false;
+            
+            // Keep lines that have = OR are pure numbers OR have box patterns
+            if (trimmed.includes('=')) return true;
+            if (/^\d+$/.test(trimmed)) return true;
+            if (/^[\d\s,.\-*_()\/]+$/.test(trimmed)) return true;
+            
+            // Remove lines with words (like "Here is", "Calculation:", etc.)
+            return false;
+        });
+        
+        return validLines.join('\n').trim();
     }
 
     // ============================================
@@ -206,12 +274,14 @@ class s0ulnixFormatter {
     formatEntryResult(entry, isLast) {
         let html = '';
         const typeLabel = entry.type === 'manual' ? '📝 Manual' : 
-                         entry.type === 'crossing' ? '✂️ Crossing' : '📊 Regular';
+                         entry.type === 'crossing' ? '✂️ Crossing' : 
+                         entry.type === 'ai' ? '🪄 AI Formatted' : '📊 Regular';
         const typeClass = entry.type === 'manual' ? 'manual-entry' : 
-                          entry.type === 'crossing' ? 'crossing-entry' : 'regular-entry';
+                          entry.type === 'crossing' ? 'crossing-entry' : 
+                          entry.type === 'ai' ? 'ai-entry' : 'regular-entry';
         
-        if (isLast && entry.type === 'regular') {
-            // Full details for last regular entry
+        if (isLast && (entry.type === 'regular' || entry.type === 'ai')) {
+            // Full details for last regular/AI entry
             html += `
                 <div class="entry-result last-entry ${typeClass}" id="entry-${entry.id}">
                     <div class="entry-header">
@@ -224,7 +294,7 @@ class s0ulnixFormatter {
             
             let blockNumber = 1;
             for (const block of entry.blocks) {
-                const icon = block.isCrossing ? '✂️' : '📦';
+                const icon = block.isCrossing ? '✂️' : (entry.type === 'ai' ? '🪄' : '📦');
                 html += `
                     <div class="calculation-line">
                         <span class="line-input">${icon} #${blockNumber}</span>
