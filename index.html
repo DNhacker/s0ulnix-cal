@@ -49,7 +49,6 @@
 88(40)
 99(15)" style="width:100%; padding:15px; padding-right:180px; border:2px solid #e0e0e0; border-radius:10px; font-size:14px; font-family:'Courier New',monospace; resize:vertical; min-height:200px; line-height:1.8;"></textarea>
                     
-                    <!-- Paste + Magic buttons inside textarea -->
                     <div style="position: absolute; right: 12px; top: 12px; display: flex; gap: 6px; z-index: 1;">
                         <button class="btn-paste-inside" onclick="pasteFromClipboard()" title="Paste from clipboard">
                             📋 Paste
@@ -110,20 +109,24 @@
 
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- Gemini AI Logic -->
-    <script src="gemini.js"></script>
+    <!-- Load libraries in correct order -->
     <script src="parser.js"></script>
     <script src="formatter.js"></script>
+    <script src="gemini.js"></script>
+
+    <!-- Main app logic -->
     <script>
-        // Initialize
-        const parser = new s0ulnixParser();
-        const formatter = new s0ulnixFormatter();
+        // ============================================
+        // INITIALIZE (global so gemini.js can access)
+        // ============================================
+        window.parser = new s0ulnixParser();
+        window.formatter = new s0ulnixFormatter();
 
         // ============================================
         // TOGGLE JC MODE
         // ============================================
         function toggleJCMode() {
-            const newState = formatter.toggleJCMode();
+            const newState = window.formatter.toggleJCMode();
             const btn = document.getElementById('jcToggleBtn');
             
             if (newState) {
@@ -194,7 +197,7 @@
             }
 
             try {
-                const result = formatter.addEntry(text);
+                const result = window.formatter.addEntry(text);
                 
                 if (!result) {
                     showToast('No valid data found in this entry', 'error');
@@ -225,7 +228,7 @@
             }
             
             const description = descInput.value.trim() || 'Manual Amount';
-            const result = formatter.addManualAmount(amount, description);
+            const result = window.formatter.addManualAmount(amount, description);
             
             if (result) {
                 amountInput.value = '';
@@ -246,7 +249,7 @@
             }
 
             try {
-                const result = formatter.addCrossingEntry(text);
+                const result = window.formatter.addCrossingEntry(text);
                 
                 if (!result) {
                     showToast('No valid crossing data found', 'error');
@@ -272,12 +275,12 @@
         // DELETE LAST ENTRY
         // ============================================
         function deleteLast() {
-            if (formatter.entries.length === 0) {
+            if (window.formatter.entries.length === 0) {
                 showToast('No entries to delete', 'error');
                 return;
             }
             
-            const result = formatter.deleteLastEntry();
+            const result = window.formatter.deleteLastEntry();
             if (result) {
                 updateDisplay();
                 showToast(`🗑️ Removed`, '');
@@ -288,10 +291,10 @@
         // CLEAR ALL
         // ============================================
         function clearAll() {
-            if (formatter.entries.length === 0) return;
+            if (window.formatter.entries.length === 0) return;
             
             if (confirm('Clear all entries?')) {
-                formatter.clearAll();
+                window.formatter.clearAll();
                 updateDisplay();
                 showToast('🗑️ All cleared', '');
             }
@@ -302,11 +305,11 @@
         // ============================================
         function updateDisplay() {
             const container = document.getElementById('entriesContainer');
-            const html = formatter.formatAllEntries();
+            const html = window.formatter.formatAllEntries();
             container.innerHTML = html;
             
             const section = document.getElementById('resultsSection');
-            if (formatter.entries.length > 0) {
+            if (window.formatter.entries.length > 0) {
                 section.classList.add('visible');
             } else {
                 section.classList.remove('visible');
