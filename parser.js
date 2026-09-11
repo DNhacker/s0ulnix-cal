@@ -7,7 +7,6 @@
 
 class s0ulnixParser {
     constructor() {
-        // Special box mapping (STEP 2)
         this.BOX_MAPPING = {
             '1111': '101', '2222': '102', '3333': '103',
             '4444': '104', '5555': '105', '6666': '106',
@@ -45,10 +44,6 @@ class s0ulnixParser {
         ];
     }
 
-    // ============================================
-    // CROSSING MODE CONTROL
-    // ============================================
-    
     setCrossingEnabled(enabled) {
         this.enableCrossing = enabled;
     }
@@ -71,10 +66,6 @@ class s0ulnixParser {
         return this.jcMode;
     }
 
-    // ============================================
-    // STEP 1: CLEAN THE INPUT
-    // ============================================
-    
     cleanInput(text) {
         let lines = text.split('\n')
             .map(line => line.trim())
@@ -96,10 +87,6 @@ class s0ulnixParser {
         return lines;
     }
 
-    // ============================================
-    // STEP 4: EXTRACT VALUE
-    // ============================================
-    
     extractValue(line) {
         for (const pattern of this.VALUE_PATTERNS) {
             const match = line.match(pattern);
@@ -116,10 +103,6 @@ class s0ulnixParser {
         return null;
     }
 
-    // ============================================
-    // EXTRACT CROSSING BOXES
-    // ============================================
-    
     extractCrossingBoxes(line) {
         let clean = line;
         
@@ -152,10 +135,6 @@ class s0ulnixParser {
         return null;
     }
 
-    // ============================================
-    // CALCULATE CROSSING TOTAL
-    // ============================================
-    
     calculateCrossing(line) {
         const value = this.extractValue(line);
         if (value === null) return null;
@@ -186,10 +165,6 @@ class s0ulnixParser {
         };
     }
 
-    // ============================================
-    // DETECT IF LINE IS CROSSING FORMAT
-    // ============================================
-    
     isCrossingFormat(line) {
         if (!this.enableCrossing) return false;
         
@@ -215,10 +190,6 @@ class s0ulnixParser {
         return length >= 3 && length <= 8;
     }
 
-    // ============================================
-    // STEP 3: EXTRACT BOXES (Standard)
-    // ============================================
-    
     extractBoxes(line) {
         let clean = line;
         
@@ -251,10 +222,6 @@ class s0ulnixParser {
         return parts.map(box => this.mapBoxNumber(box));
     }
 
-    // ============================================
-    // BOX MAPPING
-    // ============================================
-    
     mapBoxNumber(box) {
         const str = String(box);
         if (this.BOX_MAPPING[str]) {
@@ -263,10 +230,6 @@ class s0ulnixParser {
         return str;
     }
 
-    // ============================================
-    // STEP 5: DETECT FORMAT TYPE
-    // ============================================
-    
     detectFormat(line) {
         const clean = line.replace(/\s+/g, '');
         
@@ -308,18 +271,10 @@ class s0ulnixParser {
         return 'UNKNOWN';
     }
 
-    // ============================================
-    // STEP 5: PARSE LINE BY FORMAT TYPE
-    // 🐛 FIXED: Handle box=value format FIRST
-    // ============================================
-    
     parseLine(line) {
-        // ============================================
-        // 🐛 CRITICAL FIX #1: Single "01=70" format
-        // This MUST come before anything else
-        // ============================================
         const trimmed = line.trim();
         
+        // FIX #1: Single "01=70" format
         if (/^\d+=\d+$/.test(trimmed)) {
             const parts = trimmed.split('=');
             const box = this.mapBoxNumber(parts[0]);
@@ -336,10 +291,7 @@ class s0ulnixParser {
             };
         }
         
-        // ============================================
-        // 🐛 CRITICAL FIX #2: Comma-separated "01=70,02=70,03=70"
-        // This is the Gemini AI output format
-        // ============================================
+        // FIX #2: Comma-separated "01=70,02=70,03=70"
         if (/^\d+=\d+(,\s*\d+=\d+)+$/.test(trimmed)) {
             const pairs = trimmed.split(',').map(p => p.trim());
             const boxes = [];
@@ -365,10 +317,7 @@ class s0ulnixParser {
             };
         }
         
-        // ============================================
-        // 🐛 CRITICAL FIX #3: Hyphen+Equal "41-42-43=50"
-        // Must come before generic fallback
-        // ============================================
+        // FIX #3: Hyphen+Equal "41-42-43=50"
         if (/^[\d\-]+=\d+$/.test(trimmed)) {
             const [boxPart, valuePart] = trimmed.split('=');
             const boxes = boxPart.split('-')
@@ -387,9 +336,7 @@ class s0ulnixParser {
             };
         }
         
-        // ============================================
-        // 🐛 CRITICAL FIX #4: Comma+Parentheses "55,56,57(70)"
-        // ============================================
+        // FIX #4: Comma+Parentheses "55,56,57(70)"
         if (/^[\d,]+\(\d+\)$/.test(trimmed)) {
             const match = trimmed.match(/^([\d,]+)\((\d+)\)$/);
             if (match) {
@@ -410,9 +357,7 @@ class s0ulnixParser {
             }
         }
         
-        // ============================================
         // Check crossing format (only if enabled)
-        // ============================================
         if (this.isCrossingFormat(line)) {
             const result = this.calculateCrossing(line);
             if (result) {
@@ -431,9 +376,6 @@ class s0ulnixParser {
             }
         }
         
-        // ============================================
-        // Continue with standard parsing
-        // ============================================
         const format = this.detectFormat(line);
         let boxes = [];
         let value = this.extractValue(line);
@@ -535,10 +477,6 @@ class s0ulnixParser {
         };
     }
 
-    // ============================================
-    // STANDARD FORMAT PARSER
-    // ============================================
-    
     parseStandardFormat(line) {
         const formats = [
             { name: 'A', regex: /^(\d+)=(\d+)$/, parse: (m) => ({ boxes: [this.mapBoxNumber(m[1])], value: parseInt(m[2]) }) },
@@ -548,4 +486,126 @@ class s0ulnixParser {
             { name: 'E', regex: /^([\d\*]+)\((\d+)\)$/, parse: (m) => ({ boxes: m[1].split('*').map(b => this.mapBoxNumber(b.trim())), value: parseInt(m[2]) }) },
             { name: 'F', regex: /^([\d\/]+)\/(\d+)$/, parse: (m) => ({ boxes: m[1].split('/').map(b => this.mapBoxNumber(b.trim())), value: parseInt(m[2]) }) },
             { name: 'G', regex: /^([\d_]+)=(\d+)$/, parse: (m) => ({ boxes: m[1].split('_').map(b => this.mapBoxNumber(b.trim())), value: parseInt(m[2]) }) },
-            { name: 'J', regex
+            { name: 'J', regex: /^([\d\.]+)\((\d+)\)$/, parse: (m) => ({ boxes: m[1].split('..').map(b => this.mapBoxNumber(b.trim())), value: parseInt(m[2]) }) },
+            { name: 'X', regex: /^([\d,]+)==(\d+)$/, parse: (m) => ({ boxes: m[1].split(',').map(b => this.mapBoxNumber(b.trim())), value: parseInt(m[2]) }) },
+        ];
+        
+        for (const fmt of formats) {
+            const match = line.match(fmt.regex);
+            if (match) {
+                return fmt.parse(match);
+            }
+        }
+        
+        return null;
+    }
+
+    parseBlocks(text) {
+        const lines = this.cleanInput(text);
+        const blocks = [];
+        let i = 0;
+        
+        while (i < lines.length) {
+            const line = lines[i];
+            
+            const totalMatch = line.match(/^total\s*(\d+)$/i);
+            if (totalMatch) {
+                i++;
+                continue;
+            }
+            
+            const value = this.extractValue(line);
+            
+            if (value !== null) {
+                const result = this.parseLine(line);
+                if (result) {
+                    blocks.push(result);
+                }
+                i++;
+            } else {
+                let blockLines = [line];
+                let j = i + 1;
+                let foundValue = null;
+                let valueLineIndex = -1;
+                
+                while (j < lines.length) {
+                    const nextLine = lines[j];
+                    const nextValue = this.extractValue(nextLine);
+                    
+                    if (nextValue !== null) {
+                        foundValue = nextValue;
+                        valueLineIndex = j;
+                        blockLines.push(nextLine);
+                        break;
+                    } else {
+                        blockLines.push(nextLine);
+                        j++;
+                    }
+                }
+                
+                let allBoxes = [];
+                for (const bl of blockLines) {
+                    const boxes = this.extractBoxes(bl);
+                    allBoxes.push(...boxes);
+                }
+                
+                if (allBoxes.length > 0 && foundValue !== null) {
+                    blocks.push({
+                        boxes: allBoxes.map(b => this.mapBoxNumber(b)),
+                        value: foundValue,
+                        total: allBoxes.length * foundValue,
+                        format: 'MULTI_LINE',
+                        source: blockLines.join(' | '),
+                        isCrossing: false,
+                        boxesCount: allBoxes.length,
+                        display: `${allBoxes.length} boxes × ${foundValue} = ${allBoxes.length * foundValue}`
+                    });
+                }
+                
+                i = valueLineIndex !== -1 ? valueLineIndex + 1 : lines.length;
+            }
+        }
+        
+        return blocks;
+    }
+
+    process(text) {
+        const cleaned = this.cleanInput(text);
+        const blocks = this.parseBlocks(text);
+        
+        let grandTotal = 0;
+        const calculation = [];
+        
+        for (const block of blocks) {
+            const total = block.total || block.boxes.length * block.value;
+            grandTotal += total;
+            
+            calculation.push({
+                source: block.source || block.boxes.join(','),
+                boxes: block.isCrossing ? block.boxesCount : block.boxes.length,
+                value: block.value,
+                total: total,
+                format: block.format || 'UNKNOWN',
+                isCrossing: block.isCrossing || false,
+                crossingLength: block.crossingLength || 0,
+                display: block.display
+            });
+        }
+        
+        return {
+            cleanedLines: cleaned,
+            blocks: calculation,
+            grandTotal: grandTotal,
+            totalBlocks: blocks.length,
+            totalBoxes: blocks.reduce((sum, b) => sum + (b.isCrossing ? b.boxesCount : b.boxes.length), 0)
+        };
+    }
+}
+
+if (typeof window !== 'undefined') {
+    window.s0ulnixParser = s0ulnixParser;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = s0ulnixParser;
+}
