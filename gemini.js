@@ -1,12 +1,7 @@
 /**
  * gemini.js - AI Formatting with Google Gemini
- * Uses the complete Gosheet parser prompt from the original app
- * Updated: Supports both legacy AIza keys and new AQ. keys
+ * Supports both AIza and AQ. API keys
  */
-
-// ============================================
-// COMPLETE GEMINI SYSTEM PROMPT
-// ============================================
 
 const GEMINI_SYSTEM_PROMPT = `You are a smart, fluent, human-like Gosheet parser and response assistant.
 
@@ -341,20 +336,15 @@ function saveGeminiKey() {
     if (!key) {
         if (typeof showToast === 'function') {
             showToast('Please enter a valid API key', 'error');
-        } else {
-            alert('Please enter a valid API key');
         }
         return;
     }
     
-    // Accept both legacy AIza keys and new AQ. keys
     const isValidFormat = key.startsWith('AIza') || key.startsWith('AQ.');
     
     if (!isValidFormat) {
         if (typeof showToast === 'function') {
             showToast('Invalid key format. Should start with AIza or AQ.', 'error');
-        } else {
-            alert('Invalid key format. Gemini keys start with "AIza" or "AQ."');
         }
         return;
     }
@@ -373,7 +363,7 @@ function saveGeminiKey() {
 }
 
 // ============================================
-// LOAD GEMINI API KEY ON PAGE LOAD
+// LOAD KEY ON PAGE LOAD
 // ============================================
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -392,7 +382,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // ============================================
 // CALL GEMINI API
-// Uses x-goog-api-key header (works with both AIza and AQ. keys)
+// Uses x-goog-api-key header (works with AIza and AQ. keys)
 // ============================================
 
 async function callGemini(inputText) {
@@ -403,7 +393,6 @@ async function callGemini(inputText) {
     }
     
     const model = 'gemini-2.5-flash';
-    // ✅ Use header auth instead of URL query string
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
     
     const requestBody = {
@@ -424,7 +413,6 @@ async function callGemini(inputText) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            // ✅ This header works with both AIza and AQ. keys
             'x-goog-api-key': apiKey
         },
         body: JSON.stringify(requestBody)
@@ -445,7 +433,6 @@ async function callGemini(inputText) {
         }
     }
     
-    // Check for blocked content
     if (data.promptFeedback && data.promptFeedback.blockReason) {
         throw new Error('Content blocked: ' + data.promptFeedback.blockReason);
     }
@@ -455,7 +442,6 @@ async function callGemini(inputText) {
 
 // ============================================
 // CLEAN AI OUTPUT
-// Removes markdown, explanatory text, extra whitespace
 // ============================================
 
 function cleanAIOutput(text) {
@@ -463,15 +449,12 @@ function cleanAIOutput(text) {
     
     let cleaned = text.trim();
     
-    // Remove markdown code fences
     cleaned = cleaned.replace(/```[\s\S]*?```/g, (match) => {
         return match.replace(/```[a-z]*\n?/g, '').replace(/```/g, '');
     });
     
-    // Remove any remaining backticks
     cleaned = cleaned.replace(/`/g, '');
     
-    // Split into lines
     const lines = cleaned.split('\n');
     const validLines = [];
     
@@ -479,7 +462,6 @@ function cleanAIOutput(text) {
         line = line.trim();
         if (!line) continue;
         
-        // Skip common AI response headers
         const skipPatterns = [
             /^cleaned content:?$/i,
             /^calculation:?$/i,
@@ -505,13 +487,9 @@ function cleanAIOutput(text) {
         }
         if (shouldSkip) continue;
         
-        // Skip markdown headers (##, ###)
         if (/^#{1,6}\s/.test(line)) continue;
-        
-        // Skip lines that are only dashes/equals (separators)
         if (/^[-=]{3,}$/.test(line)) continue;
         
-        // Keep lines that look like valid data
         const hasEquals = line.includes('=');
         const isPureNumber = /^\d+$/.test(line);
         const isDataPattern = /^[\d\s,.\-*_()\/|'`]+$/.test(line);
@@ -527,7 +505,6 @@ function cleanAIOutput(text) {
 
 // ============================================
 // MAGIC FORMAT BUTTON
-// Main function called by the Magic button
 // ============================================
 
 async function magicFormat() {
@@ -545,7 +522,6 @@ async function magicFormat() {
         return;
     }
     
-    // Check for API key
     const apiKey = localStorage.getItem('gemini_api_key');
     if (!apiKey) {
         if (typeof showToast === 'function') {
@@ -554,7 +530,6 @@ async function magicFormat() {
         return;
     }
     
-    // Set loading state
     if (magicBtn) {
         magicBtn.disabled = true;
         magicBtn.classList.add('loading');
@@ -573,7 +548,6 @@ async function magicFormat() {
             throw new Error('AI returned empty result');
         }
         
-        // Put the formatted result into the textarea
         inputEl.value = cleaned;
         
         if (typeof showToast === 'function') {
@@ -585,7 +559,6 @@ async function magicFormat() {
         
         let errorMsg = error.message || 'Unknown error';
         
-        // Friendlier error messages
         if (errorMsg.includes('API_KEY_INVALID') || errorMsg.includes('API key not valid')) {
             errorMsg = 'Invalid API key. Please check and re-save your key.';
         } else if (errorMsg.includes('quota') || errorMsg.includes('QUOTA') || errorMsg.includes('429')) {
@@ -602,7 +575,6 @@ async function magicFormat() {
             showToast('❌ ' + errorMsg, 'error');
         }
     } finally {
-        // Reset button state
         if (magicBtn) {
             magicBtn.disabled = false;
             magicBtn.classList.remove('loading');
