@@ -1,8 +1,5 @@
 /**
  * s0ulnix Formatter - Display Results
- * Updated: Added Crossing support, manual amount entry, removed export
- * JC Mode: Toggle button - auto-resets to OFF after each crossing entry
- * FIXED: Proper handling of box=value format and AI-formatted data
  */
 
 class s0ulnixFormatter {
@@ -12,38 +9,30 @@ class s0ulnixFormatter {
         this.runningTotal = 0;
         this.manualTotal = 0;
         this.crossingTotal = 0;
-        this.jcMode = false; // JC mode - default OFF
+        this.jcMode = false;
     }
 
-    // Toggle JC mode - this is called from the button
     toggleJCMode() {
         this.jcMode = !this.jcMode;
-        this.parser.toggleJCMode(); // Sync with parser
+        this.parser.toggleJCMode();
         return this.jcMode;
     }
 
-    // Get current JC mode status
     getJCMode() {
         return this.jcMode;
     }
 
-    // Set JC mode (for initialization)
     setJCMode(enabled) {
         this.jcMode = enabled;
         this.parser.setJCMode(enabled);
     }
 
-    // Reset JC mode to OFF (called after crossing entry)
     resetJCMode() {
         this.jcMode = false;
         this.parser.resetJCMode();
         return this.jcMode;
     }
 
-    // ============================================
-    // MANUAL AMOUNT ENTRY
-    // ============================================
-    
     addManualAmount(amount, description = 'Manual') {
         if (isNaN(amount) || amount <= 0) return null;
         
@@ -66,25 +55,18 @@ class s0ulnixFormatter {
         };
     }
 
-    // ============================================
-    // CROSSING ENTRY
-    // ============================================
-    
     addCrossingEntry(text) {
-        // Enable crossing for this entry only
         this.parser.setCrossingEnabled(true);
         this.parser.setJCMode(this.jcMode);
         
         const result = this.parser.process(text);
         
-        // Reset crossing to disabled after processing
         this.parser.setCrossingEnabled(false);
         
         if (result.blocks.length === 0) {
             return null;
         }
         
-        // Check if any block is crossing
         const isCrossing = result.blocks.some(b => b.isCrossing);
         if (!isCrossing) {
             return null;
@@ -106,7 +88,6 @@ class s0ulnixFormatter {
         this.crossingTotal += entry.total;
         this.runningTotal += entry.total;
         
-        // Auto-reset JC mode to OFF after entry
         this.resetJCMode();
         
         return {
@@ -116,11 +97,6 @@ class s0ulnixFormatter {
         };
     }
 
-    // ============================================
-    // ADD ENTRY (Regular)
-    // FIXED: Handles Gemini AI-formatted data properly
-    // ============================================
-    
     addEntry(text) {
         const result = this.parser.process(text);
         
@@ -149,79 +125,6 @@ class s0ulnixFormatter {
         };
     }
 
-    // ============================================
-    // ADD AI-FORMATTED ENTRY (NEW)
-    // Specifically for Gemini-formatted data
-    // ============================================
-    
-    addAIEntry(text) {
-        // Pre-process the AI output to ensure clean formatting
-        const cleaned = this.cleanAIOutput(text);
-        
-        const result = this.parser.process(cleaned);
-        
-        if (result.blocks.length === 0) {
-            return null;
-        }
-        
-        const entry = {
-            id: Date.now(),
-            type: 'ai',
-            text: cleaned,
-            blocks: result.blocks,
-            total: result.grandTotal,
-            totalBoxes: result.totalBoxes,
-            totalBlocks: result.totalBlocks,
-            timestamp: new Date().toLocaleTimeString()
-        };
-        
-        this.entries.push(entry);
-        this.runningTotal += entry.total;
-        
-        return {
-            entry: entry,
-            runningTotal: this.runningTotal,
-            totalEntries: this.entries.length
-        };
-    }
-
-    // ============================================
-    // CLEAN AI OUTPUT (NEW)
-    // Removes markdown, extra whitespace, etc.
-    // ============================================
-    
-    cleanAIOutput(text) {
-        if (!text) return '';
-        
-        let cleaned = text.trim();
-        
-        // Remove markdown code fences
-        cleaned = cleaned.replace(/```[\s\S]*?```/g, (match) => {
-            return match.replace(/```[a-z]*\n?/g, '').replace(/```/g, '');
-        });
-        
-        // Remove any explanatory text lines (lines with words but no = or numbers)
-        const lines = cleaned.split('\n');
-        const validLines = lines.filter(line => {
-            const trimmed = line.trim();
-            if (!trimmed) return false;
-            
-            // Keep lines that have = OR are pure numbers OR have box patterns
-            if (trimmed.includes('=')) return true;
-            if (/^\d+$/.test(trimmed)) return true;
-            if (/^[\d\s,.\-*_()\/]+$/.test(trimmed)) return true;
-            
-            // Remove lines with words (like "Here is", "Calculation:", etc.)
-            return false;
-        });
-        
-        return validLines.join('\n').trim();
-    }
-
-    // ============================================
-    // DELETE LAST ENTRY
-    // ============================================
-    
     deleteLastEntry() {
         if (this.entries.length === 0) return null;
         
@@ -241,23 +144,14 @@ class s0ulnixFormatter {
         };
     }
 
-    // ============================================
-    // CLEAR ALL
-    // ============================================
-    
     clearAll() {
         this.entries = [];
         this.runningTotal = 0;
         this.manualTotal = 0;
         this.crossingTotal = 0;
-        // Reset JC mode to OFF when clearing all
         this.resetJCMode();
     }
 
-    // ============================================
-    // GET RUNNING TOTAL
-    // ============================================
-    
     getRunningTotal() {
         return {
             total: this.runningTotal,
@@ -267,10 +161,6 @@ class s0ulnixFormatter {
         };
     }
 
-    // ============================================
-    // FORMAT ENTRY RESULT
-    // ============================================
-    
     formatEntryResult(entry, isLast) {
         let html = '';
         const typeLabel = entry.type === 'manual' ? '📝 Manual' : 
@@ -281,7 +171,6 @@ class s0ulnixFormatter {
                           entry.type === 'ai' ? 'ai-entry' : 'regular-entry';
         
         if (isLast && (entry.type === 'regular' || entry.type === 'ai')) {
-            // Full details for last regular/AI entry
             html += `
                 <div class="entry-result last-entry ${typeClass}" id="entry-${entry.id}">
                     <div class="entry-header">
@@ -306,7 +195,6 @@ class s0ulnixFormatter {
             
             html += `</div></div>`;
         } else if (isLast && entry.type === 'crossing') {
-            // Full details for last crossing entry
             html += `
                 <div class="entry-result last-entry ${typeClass}" id="entry-${entry.id}">
                     <div class="entry-header">
@@ -330,7 +218,6 @@ class s0ulnixFormatter {
             
             html += `</div></div>`;
         } else if (entry.type === 'manual') {
-            // Manual entry
             html += `
                 <div class="entry-result previous-entry ${typeClass}" id="entry-${entry.id}">
                     <div class="entry-header">
@@ -342,7 +229,6 @@ class s0ulnixFormatter {
                 </div>
             `;
         } else {
-            // Previous entries - show only total
             const summary = entry.type === 'crossing' ? 
                 `✂️ ${entry.totalBlocks} crossings` : 
                 `${entry.totalBlocks} blocks · ${entry.totalBoxes} boxes`;
@@ -362,10 +248,6 @@ class s0ulnixFormatter {
         return html;
     }
 
-    // ============================================
-    // FORMAT ALL ENTRIES
-    // ============================================
-    
     formatAllEntries() {
         if (this.entries.length === 0) {
             return `
@@ -385,7 +267,6 @@ class s0ulnixFormatter {
             html += this.formatEntryResult(entry, isLast);
         }
         
-        // Running totals summary
         const totals = this.getRunningTotal();
         html += `
             <div class="running-total">
@@ -400,12 +281,10 @@ class s0ulnixFormatter {
     }
 }
 
-// Export for browser
 if (typeof window !== 'undefined') {
     window.s0ulnixFormatter = s0ulnixFormatter;
 }
 
-// Export for Node.js
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = s0ulnixFormatter;
 }
