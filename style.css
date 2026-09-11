@@ -48,10 +48,7 @@ header .badge {
     margin-top: 8px;
 }
 
-/* ============================================
-   INSTAGRAM CONTACT SECTION
-   ============================================ */
-
+/* Instagram Contact Section */
 .contact-section {
     margin-top: 15px;
     display: flex;
@@ -89,21 +86,7 @@ header .badge {
     flex-shrink: 0;
 }
 
-/* ============================================
-   FOOTER
-   ============================================ */
-
-.footer {
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 2px solid #f0f0f0;
-    text-align: center;
-}
-
-/* ============================================
-   SETTINGS PANEL (Gemini API Key)
-   ============================================ */
-
+/* Settings Panel */
 .settings-panel {
     background: #f0f4ff;
     padding: 15px;
@@ -167,94 +150,14 @@ header .badge {
     text-decoration: underline;
 }
 
-/* ============================================
-   BUTTONS INSIDE TEXTAREA (Paste + Magic)
-   ============================================ */
-
-.btn-paste-inside {
-    position: absolute;
-    right: 12px;
-    top: 12px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 8px 14px;
-    border: none;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-    z-index: 1;
-    white-space: nowrap;
-}
-
-.btn-paste-inside:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-}
-
-.btn-paste-inside:active {
-    transform: scale(0.96);
-}
-
-/* 🪄 Magic Button */
-.btn-magic-inside {
-    position: absolute;
-    right: 92px;
-    top: 12px;
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    color: white;
-    padding: 8px 14px;
-    border: none;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-    z-index: 1;
-    white-space: nowrap;
-    animation: magicGlow 2s ease-in-out infinite;
-}
-
-.btn-magic-inside:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 25px rgba(240, 147, 251, 0.6);
-    animation: none;
-}
-
-.btn-magic-inside:active {
-    transform: scale(0.96);
-}
-
-.btn-magic-inside:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    animation: none;
-}
-
-@keyframes magicGlow {
-    0%, 100% {
-        box-shadow: 0 0 5px rgba(240, 147, 251, 0.5);
-    }
-    50% {
-        box-shadow: 0 0 20px rgba(240, 147, 251, 0.9);
-    }
-}
-
-/* ============================================
-   MAIN CONTENT
-   ============================================ */
-
+/* Main Content */
 .main-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 30px;
 }
 
-/* ============================================
-   INPUT SECTION
-   ============================================ */
-
+/* Textarea */
 textarea {
     width: 100%;
     padding: 15px;
@@ -292,10 +195,7 @@ input:focus {
     flex-wrap: wrap;
 }
 
-/* ============================================
-   BUTTONS
-   ============================================ */
-
+/* Buttons */
 button {
     padding: 12px 25px;
     border: none;
@@ -380,14 +280,65 @@ button {
     transform: translateY(-2px);
 }
 
-.btn-jc.active:hover {
-    box-shadow: 0 5px 25px rgba(232, 62, 140, 0.5);
+/* Paste + Magic Buttons */
+.btn-paste-inside {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    z-index: 1;
+    white-space: nowrap;
 }
 
-/* ============================================
-   SECTIONS
-   ============================================ */
+.btn-paste-inside:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
 
+.btn-magic-inside {
+    position: absolute;
+    right: 92px;
+    top: 12px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    z-index: 1;
+    white-space: nowrap;
+    animation: magicGlow 2s ease-in-out infinite;
+}
+
+.btn-magic-inside:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 25px rgba(240, 147, 251, 0.6);
+    animation: none;
+}
+
+.btn-magic-inside:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    animation: none;
+}
+
+@keyframes magicGlow {
+    0%, 100% { box-shadow: 0 0 5px rgba(240, 147, 251, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(240, 147, 251, 0.9); }
+}
+
+/* Sections */
 .manual-section {
     margin-top: 15px;
     padding: 15px;
@@ -416,10 +367,7 @@ button {
     font-size: 14px;
 }
 
-/* ============================================
-   RESULTS SECTION
-   ============================================ */
-
+/* Results */
 .results-section {
     display: none;
 }
@@ -430,14 +378,8 @@ button {
 }
 
 @keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .entries-container {
@@ -468,10 +410,7 @@ button {
     margin-bottom: 10px;
 }
 
-/* ============================================
-   ENTRIES
-   ============================================ */
-
+/* Entries */
 .entry-result {
     background: white;
     border-radius: 10px;
@@ -504,7 +443,6 @@ button {
     font-size: 12px;
 }
 
-/* Entry Type Colors */
 .manual-entry {
     border-left-color: #ffc107 !important;
 }
@@ -515,16 +453,6 @@ button {
 
 .regular-entry {
     border-left-color: #667eea !important;
-}
-
-/* 🪄 AI Entry Type */
-.ai-entry {
-    border-left-color: #f093fb !important;
-}
-
-.ai-entry .entry-type {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    color: white;
 }
 
 .entry-header {
@@ -583,10 +511,7 @@ button {
     color: #667eea;
 }
 
-/* ============================================
-   RUNNING TOTAL
-   ============================================ */
-
+/* Running Total */
 .running-total {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -607,10 +532,7 @@ button {
     border-radius: 6px;
 }
 
-/* ============================================
-   MINIMALIST TOAST
-   ============================================ */
-
+/* Toast */
 .toast-container {
     position: fixed;
     bottom: 20px;
@@ -648,10 +570,7 @@ button {
     background: rgba(240, 147, 251, 0.9);
 }
 
-/* ============================================
-   SHORTCUT HINT
-   ============================================ */
-
+/* Shortcut Hint */
 .shortcut-hint {
     color: #aaa;
     font-size: 12px;
@@ -667,10 +586,7 @@ button {
     font-size: 11px;
 }
 
-/* ============================================
-   RESPONSIVE - TABLETS
-   ============================================ */
-
+/* Responsive */
 @media (max-width: 768px) {
     .main-content {
         grid-template-columns: 1fr;
@@ -691,10 +607,6 @@ button {
     }
 }
 
-/* ============================================
-   RESPONSIVE - MOBILE
-   ============================================ */
-
 @media (max-width: 480px) {
     body {
         padding: 10px;
@@ -709,20 +621,14 @@ button {
         font-size: 1.6em;
     }
     
-    header p {
-        font-size: 0.9em;
-    }
-    
     header .badge {
         font-size: 0.7em;
         padding: 3px 10px;
     }
     
-    /* Instagram link */
     .instagram-link {
         padding: 8px 18px;
         font-size: 13px;
-        gap: 8px;
     }
     
     .instagram-icon {
@@ -730,7 +636,6 @@ button {
         height: 18px;
     }
     
-    /* Settings panel */
     .settings-panel div {
         flex-direction: column;
     }
@@ -744,7 +649,6 @@ button {
         width: 100%;
     }
     
-    /* Button groups - stack on mobile */
     .button-group {
         flex-direction: column;
         gap: 8px;
@@ -758,7 +662,6 @@ button {
         justify-content: center;
     }
     
-    /* Manual and Crossing sections */
     .manual-section,
     .crossing-section {
         padding: 12px;
@@ -780,7 +683,6 @@ button {
         width: 100%;
     }
     
-    /* JC button */
     .btn-jc {
         width: 100%;
         justify-content: center;
@@ -788,15 +690,12 @@ button {
         padding: 10px;
     }
     
-    /* Textarea */
     textarea {
         min-height: 150px;
         font-size: 13px;
         padding: 12px;
-        padding-right: 15px;
     }
     
-    /* Paste + Magic buttons - smaller on mobile */
     .btn-paste-inside,
     .btn-magic-inside {
         padding: 6px 10px;
@@ -813,36 +712,13 @@ button {
         top: 8px;
     }
     
-    /* Entries */
     .entry-result {
         padding: 12px;
         margin-bottom: 10px;
     }
     
-    .entry-header {
-        gap: 4px;
-        font-size: 13px;
-    }
-    
-    .entry-time {
-        font-size: 11px;
-    }
-    
-    .entry-type {
-        font-size: 10px;
-        padding: 1px 8px;
-    }
-    
     .entry-total {
         font-size: 15px;
-    }
-    
-    .previous-entry {
-        padding: 8px 12px;
-    }
-    
-    .previous-entry .entry-summary {
-        font-size: 10px;
     }
     
     .calculation-line {
@@ -851,16 +727,11 @@ button {
         flex-wrap: wrap;
     }
     
-    .calculation-line .line-result {
-        font-size: 12px;
-    }
-    
     .entries-container {
         max-height: 350px;
         padding: 12px;
     }
     
-    /* Running total */
     .running-total {
         font-size: 12px;
         padding: 12px 15px;
@@ -876,96 +747,34 @@ button {
         text-align: center;
     }
     
-    /* Toast - smaller on mobile */
     .toast {
         font-size: 12px;
         padding: 6px 14px;
-        border-radius: 5px;
         max-width: 90vw;
     }
-    
-    /* Empty state */
-    .empty-state {
-        padding: 25px;
-    }
-    
-    .empty-state .icon {
-        font-size: 36px;
-    }
-    
-    .empty-state p {
-        font-size: 14px;
-    }
-    
-    /* Shortcut hint */
-    .shortcut-hint {
-        font-size: 11px;
-    }
 }
-
-/* ============================================
-   RESPONSIVE - SMALL PHONES
-   ============================================ */
 
 @media (max-width: 360px) {
-    .container {
-        padding: 10px;
-    }
-    
-    header h1 {
-        font-size: 1.4em;
-    }
-    
-    button {
-        font-size: 13px;
-        padding: 10px;
-    }
-    
-    .entry-total {
-        font-size: 14px;
-    }
-    
-    .calculation-line {
-        font-size: 11px;
-    }
-    
-    .running-total {
-        font-size: 11px;
-    }
-    
-    /* Hide button labels on very small screens */
-    .btn-paste-inside,
-    .btn-magic-inside {
-        padding: 5px 8px;
-        font-size: 10px;
-    }
-    
-    .btn-magic-inside {
-        right: 65px;
-    }
+    .container { padding: 10px; }
+    header h1 { font-size: 1.4em; }
+    button { font-size: 13px; padding: 10px; }
+    .entry-total { font-size: 14px; }
+    .calculation-line { font-size: 11px; }
+    .running-total { font-size: 11px; }
+    .btn-paste-inside, .btn-magic-inside { padding: 5px 8px; font-size: 10px; }
+    .btn-magic-inside { right: 65px; }
 }
 
-/* ============================================
-   TOUCH FRIENDLY - Larger tap targets
-   ============================================ */
-
 @media (max-width: 768px) {
-    button,
-    .btn-jc,
-    input[type="number"],
-    input[type="text"] {
+    button, .btn-jc, input[type="number"], input[type="text"] {
         min-height: 44px;
     }
-    
     textarea {
         min-height: 120px;
     }
 }
 
-/* ============================================
-   MAGIC BUTTON LOADING STATE
-   ============================================ */
-
+/* Magic Button Loading State */
 .btn-magic-inside.loading {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     animation: magicSpin 1s linear infinite;
@@ -976,21 +785,4 @@ button {
     25% { transform: rotate(-5deg); }
     75% { transform: rotate(5deg); }
     100% { transform: rotate(0deg); }
-}
-
-/* ============================================
-   AI FORMATTING BADGE (Optional)
-   ============================================ */
-
-.ai-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    color: white;
-    font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 10px;
-    margin-left: 6px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
